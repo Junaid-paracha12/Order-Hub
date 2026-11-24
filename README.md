@@ -26,6 +26,9 @@ python -m pytest -q tests                          # 12 tests
 or `docker build -t order-hub . && docker run -p 8000:8000 order-hub`.
 The pinned library versions matter (scikit-learn pickles). The XGBoost booster is stored as JSON inside the joblib (`scripts/make_portable.py`), so it loads on Windows/Linux and across XGBoost builds.
 
+## Deploy to Vercel
+Import the repository with its root directory set to the repository root. Vercel detects the FastAPI app in `app/main.py`; `vercel.json` includes the data, frontend, and model files that the function reads at runtime. After deployment, check the Vercel Runtime Logs if `/api/health` still fails.
+
 ## Customer-chosen delivery date
 On screen 1 the customer's wished date can be entered (and freight left empty). The hub returns the typical **freight** for the route and weight band, the **chance** that the parcel arrives by the wished date, and the earliest dates it can promise at 80 / 90 / 94 / 99 % certainty. Freight cannot buy speed: inside one route and weight band, freight and delivery days are almost uncorrelated (≈ -0.07), and the Olist data has no express option, so the date is something the shop promises, not something priced.
 The promise multiplier is **calibrated** (`scripts/calibrate.py` → `data/calibration.json`): a raw ratio quantile of 0.94 would give ≈ 99 % on-time, not 94 %. Calibration used 2,500 test-period orders replayed through this app.
