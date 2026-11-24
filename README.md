@@ -24,7 +24,7 @@ python -m uvicorn app.main:app --port 8000        # open http://localhost:8000  
 python -m pytest -q tests                          # 12 tests
 ```
 or `docker build -t order-hub . && docker run -p 8000:8000 order-hub`.
-The pinned library versions matter (scikit-learn pickles). The XGBoost booster is stored as JSON inside the joblib (`scripts/make_portable.py`), so it loads on Windows/Linux and across XGBoost builds.
+The pinned library versions matter (scikit-learn pickles). The XGBoost booster is stored as JSON inside the joblib (`scripts/make_portable.py`), so it loads on Windows/Linux and across XGBoost builds. `xgboost-cpu` provides the same `xgboost` Python module with CPU-only inference and avoids the larger GPU dependencies in Vercel's function bundle.
 
 ## Deploy to Vercel
 Import the repository with its root directory set to the repository root. Vercel detects the FastAPI app in `app/main.py`; `vercel.json` includes the data, frontend, and model files that the function reads at runtime. After deployment, check the Vercel Runtime Logs if `/api/health` still fails.
