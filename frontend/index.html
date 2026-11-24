@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Order Hub - Delivery and Demand</title>
+  <style>
+    :root {
+      --bg: #f4f5f7;
+      --card: #fff;
+      --ink: #17202c;
+      --mut: #667085;
+      --line: #e3e6eb;
+      --acc: #2457d6;
+      --accbg: #e8eefc;
+      --ok: #127a4b;
+      --okbg: #e4f3ea;
+      --warn: #b54708;
+      --warnbg: #fdf0e1;
+      --bad: #b42318;
+      --badbg: #fde8e6
+    }
+
+    @media(prefers-color-scheme:dark) {
+      :root {
+        --bg: #0f131a;
+        --card: #171d27;
+        --ink: #e8ecf3;
+        --mut: #98a2b3;
+        --line: #2a3342;
+        --acc: #7aa2ff;
+        --accbg: #1b2644;
+        --ok: #5fd39b;
+        --okbg: #14301f;
+        --warn: #f5b366;
+        --warnbg: #33260f;
+        --bad: #ff8f84;
+        --badbg: #3a1815
+      }
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif
+    }
+
+    .wrap {
+      max-width: 1020px;
+      margin: auto;
+      padding: 20px 16px 48px
+    }
+
+    h1 {
+      font-size: 22px;
+      margin: 0 0 4px
+    }
+
+    .sub {
+      color: var(--mut);
+      margin: 0 0 18px
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 18px
+    }
+
+    .tab {
+      background: var(--card);
+      border: 2px solid var(--line);
+      border-radius: 12px;
+      padding: 14px 16px;
+      text-align: left;
+      cursor: pointer;
+      font: inherit;
+      color: var(--ink)
+    }
+
+    .tab small {
+      display: block;
+      color: var(--mut);
+      font-size: 13px
+    }
+
+    .tab b {
+      font-size: 17px
+    }
+
+    .tab .n {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      line-height: 24px;
+      text-align: center;
+      border-radius: 50%;
+      background: var(--line);
+      margin-right: 8px;
+      font-size: 13px
+    }
+
+    .tab.on {
+      border-color: var(--acc);
+      background: var(--accbg)
+    }
+
+    .tab.on .n {
+      background: var(--acc);
+      color: #fff
+    }
+
+    .screen {
+      display: none
+    }
+
+    .screen.on {
+      display: block
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 16px
+    }
+
+    .two {
+      display: grid;
+      grid-template-columns: minmax(260px, 360px) 1fr;
+      gap: 16px
+    }
+
+    @media(max-width:760px) {
+      .two {
+        grid-template-columns: 1fr
+      }
+    }
+
+    h2 {
+      font-size: 17px;
+      margin: 0 0 4px
+    }
+
+    .hint {
+      color: var(--mut);
+      font-size: 14px;
+      margin: 0 0 12px
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      color: var(--mut);
+      margin: 10px 0 3px
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--bg);
+      color: var(--ink);
+      font: inherit
+    }
+
+    .r2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px
+    }
+
+    button.pri {
+      width: 100%;
+      margin-top: 16px;
+      background: var(--acc);
+      color: #fff;
+      border: 0;
+      border-radius: 10px;
+      padding: 12px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer
+    }
+
+    @media(prefers-color-scheme:dark) {
+      button.pri {
+        color: #0b1530
+      }
+    }
+
+    .chips {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 6px
+    }
+
+    .chip {
+      border: 1px solid var(--line);
+      background: var(--bg);
+      color: var(--ink);
+      border-radius: 99px;
+      padding: 4px 12px;
+      font-size: 13px;
+      cursor: pointer
+    }
+
+    .chip:hover {
+      border-color: var(--acc)
+    }
+
+    .big {
+      text-align: center;
+      padding: 10px 0 6px
+    }
+
+    .big .lbl {
+      color: var(--mut);
+      font-size: 14px
+    }
+
+    .big .num {
+      font-size: 52px;
+      font-weight: 800;
+      line-height: 1.1
+    }
+
+    .big .date {
+      color: var(--mut)
+    }
+
+    .meter {
+      height: 12px;
+      background: var(--line);
+      border-radius: 99px;
+      overflow: hidden;
+      margin: 6px 0
+    }
+
+    .meter i {
+      display: block;
+      height: 100%;
+      border-radius: 99px
+    }
+
+    .facts {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      margin-top: 14px
+    }
+
+    .facts div {
+      background: var(--bg);
+      border-radius: 10px;
+      padding: 10px 12px
+    }
+
+    .facts b {
+      display: block;
+      font-size: 20px
+    }
+
+    .facts span {
+      font-size: 12.5px;
+      color: var(--mut)
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 3px 12px;
+      border-radius: 99px;
+      font-weight: 700;
+      font-size: 14px
+    }
+
+    .ok {
+      background: var(--okbg);
+      color: var(--ok)
+    }
+
+    .warn {
+      background: var(--warnbg);
+      color: var(--warn)
+    }
+
+    .bad {
+      background: var(--badbg);
+      color: var(--bad)
+    }
+
+    .how {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px
+    }
+
+    .how div {
+      border-left: 3px solid var(--acc);
+      padding: 2px 12px
+    }
+
+    .how b {
+      display: block
+    }
+
+    .how span {
+      color: var(--mut);
+      font-size: 14px
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14.5px
+    }
+
+    th,
+    td {
+      padding: 8px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      white-space: nowrap
+    }
+
+    th {
+      color: var(--mut);
+      font-size: 12.5px
+    }
+
+    td.n,
+    th.n {
+      text-align: right;
+      font-variant-numeric: tabular-nums
+    }
+
+    .scroll {
+      overflow-x: auto
+    }
+
+    tr.click {
+      cursor: pointer
+    }
+
+    tr.click:hover,
+    tr.sel {
+      background: var(--accbg)
+    }
+
+    td input {
+      width: 84px;
+      text-align: right;
+      padding: 5px 8px
+    }
+
+    svg text {
+      fill: var(--mut);
+      font-size: 11px
+    }
+
+    .empty {
+      color: var(--mut);
+      text-align: center;
+      padding: 50px 10px
+    }
+
+    .err {
+      color: var(--bad);
+      margin-top: 8px
+    }
+
+    .note {
+      font-size: 13px;
+      color: var(--mut);
+      margin-top: 10px
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <h1>E-Commerce Order Hub</h1>
+    <p class="sub">Two models, two questions: <b>"When will this order arrive?"</b> and <b>"How much stock do we need
+        next week?"</b></p>
+    <div class="tabs"><button class="tab on" data-s="s1"><b><span class="n">1</span>Delivery promise</b><small>Per order
+          · what date do we tell the customer?</small></button>
+      <button class="tab" data-s="s2"><b><span class="n">2</span>Warehouse demand</b><small>Per category · how many
+          units next week?</small></button>
+    </div>
+
+    <div class="screen on" id="s1">
+      <div class="two">
+        <div class="card">
+          <h2>New order</h2>
+          <p class="hint">Enter what is known at checkout.</p>
+          <div class="chips"><span class="chip" data-p="local">Same-state order</span><span class="chip"
+              data-p="far">Far away (Amazonas)</span><span class="chip" data-p="heavy">Heavy parcel</span></div>
+          <div class="r2">
+            <div><label>Seller state</label><select id="ss"></select></div>
+            <div><label>Customer state</label><select id="cs"></select></div>
+          </div>
+          <div class="r2">
+            <div><label>Freight (R$) - empty = automatic</label><input id="fr" type="number" min="0"
+                placeholder="automatic"></div>
+            <div><label>Weight (g)</label><input id="wg" type="number" min="1" value="1500"></div>
+          </div>
+          <div class="r2">
+            <div><label>Items</label><input id="ni" type="number" min="1" value="1"></div>
+            <div><label>Payment</label><select id="pay"></select></div>
+          </div>
+          <label>Order time</label><input id="ot" type="datetime-local" value="2018-08-20T14:30"><label>Customer wants
+            it by (optional)</label><input id="wd" type="date" value="2018-09-05">
+          <button class="pri" id="go1">Calculate delivery promise</button>
+          <div class="err" id="e1"></div>
+        </div>
+        <div class="card" id="out1">
+          <div class="empty">Fill the order and press the button.<br>Or click an example above.</div>
+        </div>
+      </div>
+    
+    </div>
+
+    <div class="screen" id="s2">
+      <div class="card">
+        <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:end;justify-content:space-between">
+          <div>
+            <h2>Next week's demand per category</h2>
+            <p class="hint" style="margin:0" id="wk">Loading...</p>
+          </div>
+          <div><label style="margin-top:0">Chance of not running out</label><select id="sl">
+              <option value="0.8">80 %</option>
+              <option value="0.9" selected>90 %</option>
+              <option value="0.95">95 %</option>
+            </select></div>
+        </div>
+        <div class="facts" id="kp"></div>
+      </div>
+      <div class="card">
+        <h2>Forecast and what to order</h2>
+        <p class="hint">Type the stock you have now in the last column and press Enter or Tab. The hub says how many
+          units to order up to the reorder level. Click a category to see its history.</p>
+        <div class="scroll">
+          <table id="tb"></table>
+        </div>
+        <div class="note">Stock is typed by hand: Olist has no stock data, so this page compares the forecast with the
+          numbers you enter.</div>
+      </div>
+      <div class="card">
+        <h2 id="ct">History</h2>
+        <div id="ch"></div>
+      </div>
+    
+    </div>
+  </div>
+  <script>
+    const $ = s => document.querySelector(s), api = async (u, o) => { const r = await fetch(u, o); if (!r.ok) { let m = r.statusText; try { m = JSON.stringify((await r.json()).detail) } catch (e) { } throw new Error(m) } return r.json() };
+    const el = (t, a = {}, ...k) => { const e = document.createElement(t); for (const [x, v] of Object.entries(a)) x == 'class' ? e.className = v : e.setAttribute(x, v); k.flat().forEach(c => e.append(c)); return e };
+    document.querySelectorAll('.tab').forEach(b => b.onclick = () => { document.querySelectorAll('.tab').forEach(x => x.classList.toggle('on', x == b)); document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id == b.dataset.s)); location.hash = b.dataset.s });
+    const opt = (s, a, v) => { a.forEach(x => s.append(el('option', { value: x }, x))); s.value = v };
+    const PRE = { local: { ss: 'SP', cs: 'SP', fr: '', wg: 800, ni: 1, wd: '2018-08-25' }, far: { ss: 'SP', cs: 'AM', fr: '', wg: 2000, ni: 1, wd: '2018-09-15' }, heavy: { ss: 'SP', cs: 'RJ', fr: '', wg: 18000, ni: 2, wd: '2018-09-01' } };
+    document.querySelectorAll('.chip').forEach(c => c.onclick = () => { const p = PRE[c.dataset.p]; $('#ss').value = p.ss; $('#cs').value = p.cs; $('#fr').value = p.fr; $('#wg').value = p.wg; $('#ni').value = p.ni; $('#wd').value = p.wd; go1() });
+    async function go1() {
+      $('#e1').textContent = ''; try {
+        const r = await api('/api/delivery/predict', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ seller_state: $('#ss').value, customer_state: $('#cs').value, freight: $('#fr').value === '' ? null : +$('#fr').value, desired_date: $('#wd').value || null, weight_g: +$('#wg').value, n_items: +$('#ni').value, payment_type: $('#pay').value, purchase_time: $('#ot').value.replace('T', ' ') }) });
+        const risk = r.late_risk, col = risk >= r.alert_threshold ? 'var(--bad)' : risk > .08 ? 'var(--warn)' : 'var(--ok)';
+        $('#out1').replaceChildren(el('div', { class: 'big' }, el('div', { class: 'lbl' }, 'Tell the customer it arrives in'), el('div', { class: 'num' }, Math.ceil(r.promise_days) + ' days'), el('div', { class: 'date' }, 'by ' + r.promise_date + ' · holds for ' + Math.round(r.on_time_target * 100) + ' of 100 orders')),
+          el('div', { class: 'facts' }, el('div', {}, el('b', {}, r.expected_days + ' days'), el('span', {}, 'expected (model prediction)')), el('div', {}, el('b', {}, r.marketplace_estimate_days + ' days'), el('span', {}, 'marketplace estimate for this route')), el('div', {}, el('b', {}, 'R$ ' + r.freight_used), el('span', {}, r.freight_estimated ? 'freight: typical for this route and weight' : 'freight you entered'))), wish(r),
+          el('div', { style: 'margin-top:16px' }, el('div', { style: 'display:flex;justify-content:space-between' }, el('span', {}, 'Risk of being later than the marketplace estimate'), el('b', { style: 'color:' + col }, Math.round(risk * 100) + ' %')), el('div', { class: 'meter' }, el('i', { style: 'width:' + Math.min(100, risk * 100) + '%;background:' + col }))),
+          el('div', { style: 'margin-top:8px' }, r.alert ? el('span', { class: 'pill bad' }, 'ALERT - warn the customer and the seller early') : el('span', { class: 'pill ok' }, 'No alert - normal order')),
+          el('div', { class: 'note' }, 'Alert level: risk ≥ ' + Math.round(r.alert_threshold * 100) + ' %. The promise is longer than the expected days on purpose (safety factor).'), (r.promise_days > r.marketplace_estimate_days ? el('div', { class: 'note', style: 'color:var(--warn)' }, 'Note: for this route the safe date is later than the marketplace\'s own estimate. The 18 vs 21.4 days gain is an average over all test orders, not true for every route (slow, far routes get long promises).') : ''))
+      } catch (x) { $('#e1').textContent = x.message }
+    }
+    function wish(r) {
+      const d = r.desired; if (!d) return ''; const V = { safe: ['ok', 'We can offer this date'], risky: ['warn', 'Possible, but risky'], unrealistic: ['bad', 'Not realistic - offer a later date'], impossible: ['bad', 'Date is already past'] }, v = V[d.verdict], c = d.chance, col = d.verdict == 'safe' ? 'var(--ok)' : d.verdict == 'risky' ? 'var(--warn)' : 'var(--bad)';
+      const e = d.earliest_dates; return el('div', { style: 'margin-top:16px;border:1px solid var(--line);border-radius:10px;padding:12px 14px' }, el('b', {}, 'Customer wants it by ' + d.date + ' (' + d.days_available + ' days)'),
+        el('div', { style: 'display:flex;justify-content:space-between;margin-top:6px' }, el('span', {}, 'Chance it arrives by then'), el('b', { style: 'color:' + col }, (c >= .99 ? '>99' : c <= .01 ? '<1' : Math.round(c * 100)) + ' %')), el('div', { class: 'meter' }, el('i', { style: 'width:' + Math.min(100, c * 100) + '%;background:' + col })), el('span', { class: 'pill ' + v[0] }, v[1]),
+        el('div', { class: 'note' }, 'Earliest date we can promise: ', ['80%', '90%', '94%', '99%'].map(k => el('span', { style: 'margin-right:12px' }, el('b', {}, e[k]), ' (' + k + ' sure)'))),
+        el('div', { class: 'note' }, 'Paying more freight does not make the parcel faster in this data (same route and weight: correlation of freight with days is about -0.07). So the date is a promise to choose, not something freight can buy.'))
+    }
+    let FC = [], SEL = 'health_beauty';
+    async function loadW() { FC = await api('/api/demand?service_level=' + $('#sl').value); $('#wk').textContent = 'Week starting ' + FC[0].week + ' · 20 biggest categories'; draw(null) }
+    function draw(act) {
+      const old = {}; document.querySelectorAll('#tb input').forEach(i => old[i.dataset.c] = i.value); const t = $('#tb');
+      t.replaceChildren(el('tr', {}, ...['Category', 'Last week', 'Forecast', 'Reorder level', 'Stock now', ...(act ? ['Order', ''] : [])].map((h, i) => el('th', i ? { class: 'n' } : {}, h))));
+      FC.forEach((f, i) => {
+        const a = act && act[i], inp = el('input', { type: 'number', min: 0, 'data-c': f.category }); inp.value = old[f.category] || ''; inp.onclick = e => e.stopPropagation(); inp.onchange = () => stock();
+        const r = el('tr', { class: 'click' + (f.category == SEL ? ' sel' : '') }, el('td', {}, f.category), el('td', { class: 'n' }, String(f.last_week_units)), el('td', { class: 'n' }, String(Math.round(f.forecast_units))), el('td', { class: 'n' }, String(f.reorder_level)), el('td', { class: 'n' }, inp));
+        if (act) r.append(el('td', { class: 'n' }, a.order_qty ? String(a.order_qty) : '-'), el('td', {}, el('span', { class: 'pill ' + (a.status == 'OK' ? 'ok' : 'bad') }, a.status == 'OK' ? 'OK' : 'ORDER'))); r.onclick = () => { SEL = f.category; draw(act); chart() }; t.append(r)
+      });
+      const tot = FC.reduce((s, f) => s + f.forecast_units, 0), rl = FC.reduce((s, f) => s + f.reorder_level, 0);
+      $('#kp').replaceChildren(...[[Math.round(tot), 'units expected next week'], [rl, 'units to hold in total (reorder levels)'], ...(act ? [[act.filter(a => a.status != 'OK').length, 'categories to order now']] : [])].map(([v, l]) => el('div', {}, el('b', {}, String(v)), el('span', {}, l))))
+    }
+    let tm; function stock() {
+      clearTimeout(tm); tm = setTimeout(async () => {
+        const s = {}; document.querySelectorAll('#tb input').forEach(i => { if (i.value !== '') s[i.dataset.c] = +i.value }); if (!Object.keys(s).length) { draw(null); return }
+        const a = await api('/api/demand/stock', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ stock: s, service_level: +$('#sl').value }) }); a.forEach(x => { if (!(x.category in s)) x.status = 'OK', x.order_qty = 0 }); FC = a; draw(a)
+      }, 50)
+    }
+    async function chart() {
+      const h = await api('/api/demand/history?category=' + SEL + '&weeks=40'), f = FC.find(x => x.category == SEL); $('#ct').textContent = SEL + ' - units per week and next-week forecast';
+      const W = 980, H = 230, m = 30, mx = Math.max(...h.units, f.reorder_level) * 1.1, n = h.units.length + 1, bw = (W - 2 * m) / n; let s = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" role="img" aria-label="weekly units">';
+      for (let i = 0; i <= 4; i++) { const y = H - m - (H - 2 * m) * i / 4; s += '<line x1="' + m + '" x2="' + (W - m) + '" y1="' + y + '" y2="' + y + '" stroke="currentColor" opacity=".12"/><text x="2" y="' + (y + 4) + '">' + Math.round(mx * i / 4) + '</text>' }
+      h.units.forEach((v, i) => { const bh = (H - 2 * m) * v / mx; s += '<rect x="' + (m + i * bw + 2) + '" y="' + (H - m - bh) + '" width="' + (bw - 4) + '" height="' + bh + '" fill="#7aa2ff" opacity=".75"><title>' + h.weeks[i] + ': ' + v + '</title></rect>' });
+      const x = m + h.units.length * bw + 2, bh = (H - 2 * m) * f.forecast_units / mx, rh = (H - 2 * m) * f.reorder_level / mx;
+      s += '<rect x="' + x + '" y="' + (H - m - bh) + '" width="' + (bw - 4) + '" height="' + bh + '" fill="#2457d6"><title>forecast ' + Math.round(f.forecast_units) + '</title></rect><line x1="' + (x - 6) + '" x2="' + (x + bw) + '" y1="' + (H - m - rh) + '" y2="' + (H - m - rh) + '" stroke="#b42318" stroke-width="3"/><text x="' + (x - 130) + '" y="' + (H - m - rh - 6) + '">reorder level ' + f.reorder_level + '</text></svg><div class="note">Light bars = past weeks · dark bar = forecast · red line = reorder level.</div>'; $('#ch').innerHTML = s
+    }
+    (async () => {
+      const m = await api('/api/meta'); opt($('#ss'), m.customer_states, 'SP'); opt($('#cs'), m.customer_states, 'RJ'); opt($('#pay'), m.payment_types, 'credit_card');
+      $('#go1').onclick = go1; $('#sl').onchange = async () => { await loadW(); stock(); chart() }; await loadW(); chart(); go1(); if (location.hash == '#s2') document.querySelector('[data-s=s2]').click()
+    })().catch(e => document.body.prepend(el('pre', { class: 'err' }, 'Failed to load: ' + e.message)));
+  </script>
+</body>
+
+</html>
